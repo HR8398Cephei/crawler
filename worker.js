@@ -6,11 +6,11 @@ const { parentPort } = require('worker_threads');
 let htmlElements;
 let IDs = [];
 let proxy = {
-  host: 'tps134.kdlapi.com',
+  host: 'tps139.kdlapi.com',
   port: 15818,
   auth: {
-    username: 't10307854296622',
-    password: '2fmyjwri',
+    username: 't10334422427877',
+    password: 'tof5no8q',
   },
 };
 let results = {};

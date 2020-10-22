@@ -5,10 +5,14 @@ const path = require('path');
 const WorkPool = require('./workerPool');
 
 // const TOTAL_FILE_COUNT = 0;
+const WORKER_COUNT = 40;
 
 let IDs = [];
 let maxIndex = -1;
-const workerPool = new WorkPool(path.join(__dirname, 'worker.js'), 40);
+const workerPool = new WorkPool(
+  path.join(__dirname, 'worker.js'),
+  WORKER_COUNT
+);
 
 const parseIDs = () => {
   const fileData = fs.readFileSync(path.join(__dirname, 'id_list.csv'));
