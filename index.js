@@ -6,7 +6,7 @@ const WorkPool = require('./workerPool');
 
 // const TOTAL_FILE_COUNT = 0;
 const WORKER_COUNT = 40;
-const GAP = 10;
+const GAP = 100;
 
 let IDs = [];
 let maxIndex = -1;
