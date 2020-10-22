@@ -7,7 +7,6 @@ const WorkPool = require('./workerPool');
 // const TOTAL_FILE_COUNT = 0;
 
 let IDs = [];
-let indexs = new Set();
 let maxIndex = -1;
 const workerPool = new WorkPool(path.join(__dirname, 'worker.js'), 40);
 
@@ -41,12 +40,12 @@ const parseIDs = () => {
   // console.log(Array.from(indexs).length);
 };
 
-const wirteFileInsist = (fileName, content) => {
+const saveResultsToFile = (fileName, content) => {
   fs.writeFile(fileName, content, err => {
     if (err) {
       setTimeout(() => {
-        wirteFileInsist(fileName, content);
-      }, 10);
+        saveResultsToFile(fileName, content);
+      }, 0);
     } else {
       console.log(`${fileName} successfully saved`);
     }
@@ -61,13 +60,11 @@ const run = () => {
       (result, err) => {
         if (err) {
           console.log(err);
-          wirteFileInsist(`errors/err_${i}.txt`, err.stack);
+          saveResultsToFile(`errors/err_${i}.txt`, err.stack);
         } else {
           console.log(result);
-          // results.push(...result.results);
-          // invalidIDs.push(...result.invalidIDs);
-          wirteFileInsist(
-            `ids/res_${i}.json`,
+          saveResultsToFile(
+            `results/res_${i}.json`,
             JSON.stringify({
               valid: result.results,
               invalid: result.invalidIDs,

@@ -5,8 +5,6 @@ const { parentPort } = require('worker_threads');
 
 let htmlElements;
 let IDs = [];
-let proxyPool = [];
-let proxyIndex = 0;
 let proxy = {
   host: 'tps134.kdlapi.com',
   port: 15818,
@@ -15,7 +13,7 @@ let proxy = {
     password: '2fmyjwri',
   },
 };
-let results = [];
+let results = {};
 
 const invalidIDs = new Set();
 
@@ -55,6 +53,16 @@ const invalidMap = new Map();
 //   proxy = proxyPool[proxyIndex];
 // };
 
+const saveHtmlFile = (ID, html) => {
+  fs.writeFile(`html/res_${ID}.html`, html, err => {
+    if (err) {
+      setTimeout(() => {
+        saveHtmlFile(ID, html);
+      }, 0);
+    }
+  });
+};
+
 const parseHtml = (ID, html) => {
   // console.log(html);
   htmlElements = cheerio.load(html)(
@@ -66,16 +74,9 @@ const parseHtml = (ID, html) => {
     IDs.push(ID);
   } else {
     console.log(`Success with ID: ${ID}, title: ${htmlElements.text().trim()}`);
-    results.push(htmlElements.text().trim());
+    results[ID] = htmlElements.text().trim();
+    saveHtmlFile(ID, html);
   }
-};
-
-const saveHtmlFile = (ID, html) => {
-  fs.writeFile(`html/res_${ID}.html`, html, err => {
-    if (err) {
-      console.log(err.message);
-    }
-  });
 };
 
 const crawl = async ID => {
@@ -85,9 +86,7 @@ const crawl = async ID => {
       timeout: 15000,
       proxy,
     });
-    // parseHtml(ID, res.data);
-    saveHtmlFile(ID, res.data);
-    results.push(ID);
+    parseHtml(ID, res.data);
   } catch (err) {
     console.log(`Error with ID: ${ID}, message: ${err.message}`);
     // const resetProxyAndContinue = async () => {
@@ -125,7 +124,7 @@ const run = async data => {
     invalidIDs: Array.from(invalidIDs),
   });
 
-  results = [];
+  results = {};
   invalidIDs.clear();
   invalidMap.clear();
 };
