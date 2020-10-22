@@ -47,9 +47,7 @@ const parseIDs = () => {
 const saveResultsToFile = (fileName, content) => {
   fs.writeFile(fileName, content, err => {
     if (err) {
-      setTimeout(() => {
-        saveResultsToFile(fileName, content);
-      }, 0);
+      console.log(`save ${fileName} failed`);
     } else {
       console.log(`${fileName} successfully saved`);
     }
@@ -67,13 +65,7 @@ const run = () => {
           saveResultsToFile(`errors/err_${i}.txt`, err.stack);
         } else {
           console.log(result);
-          saveResultsToFile(
-            `results/res_${i}.json`,
-            JSON.stringify({
-              valid: result.results,
-              invalid: result.invalidIDs,
-            })
-          );
+          saveResultsToFile(`results/res_${i}.json`, JSON.stringify(result));
         }
       }
     );

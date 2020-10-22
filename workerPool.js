@@ -91,19 +91,32 @@ class WorkerPool {
     worker.once(
       'message',
       ((workerID, taskItem, result) => {
-        taskItem.callback(result);
-        this.cleanup(workerID);
+        try {
+          taskItem.callback(result);
+        } catch (err) {
+          console.log(`WorkerID: ${workerID}, Error: ${err.message}`);
+        } finally {
+          this.cleanup(workerID);
+        }
       }).bind(this, workerID, taskItem)
     );
     worker.once(
       'error',
       ((workerID, taskItem, err) => {
-        taskItem.callback('', err);
-        this.cleanup(workerID);
-      }).bind(workerID, taskItem)
+        try {
+          taskItem.callback('', err);
+        } catch (err) {
+          console.log(`WorkerID: ${workerID}, Error: ${err.message}`);
+        } finally {
+          this.cleanup(workerID);
+        }
+      }).bind(this, workerID, taskItem)
     );
 
-    worker.postMessage(taskItem.taskData);
+    worker.postMessage({
+      workerID,
+      data: taskItem.taskData,
+    });
   }
 }
 
