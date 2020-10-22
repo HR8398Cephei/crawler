@@ -81,7 +81,7 @@ class WorkerPool {
 
     setTimeout(() => {
       this.runWorker(workerID, this.taskQueue.shift());
-    }, 1);
+    }, 100);
   };
 
   runWorker(workerID, taskItem) {
@@ -92,7 +92,7 @@ class WorkerPool {
       'message',
       ((workerID, taskItem, result) => {
         try {
-          taskItem.callback(result);
+          taskItem.callback({ result, workerID });
         } catch (err) {
           console.log(`WorkerID: ${workerID}, Error: ${err.message}`);
         } finally {

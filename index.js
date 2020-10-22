@@ -6,6 +6,7 @@ const WorkPool = require('./workerPool');
 
 // const TOTAL_FILE_COUNT = 0;
 const WORKER_COUNT = 40;
+const GAP = 10;
 
 let IDs = [];
 let maxIndex = -1;
@@ -16,9 +17,9 @@ const workerPool = new WorkPool(
 
 const parseIDs = () => {
   const fileData = fs.readFileSync(path.join(__dirname, 'id_list.csv'));
-  IDs = parse(fileData, { columns: ['line', 'ID'], trim: true }).map(
-    item => item.ID
-  );
+  IDs = parse(fileData, { columns: ['line', 'ID'], trim: true })
+    .map(item => item.ID)
+    .filter(ID => !fs.existsSync(`html/res_${ID}.html`));
 
   // const savedInvalidIDs = [];
   // const count = new Map();
@@ -35,7 +36,7 @@ const parseIDs = () => {
 
   // IDs.push(...savedInvalidIDs);
 
-  maxIndex = Math.ceil(IDs.length / 100);
+  maxIndex = Math.ceil(IDs.length / GAP);
 
   console.log(maxIndex);
   // console.log(count);
@@ -58,14 +59,17 @@ const run = () => {
   for (let i = 0; i < maxIndex; i++) {
     // if (i <= TOTAL_FILE_COUNT && !indexs.has(i)) continue;
     workerPool.run(
-      IDs.slice(i * 100, Math.min(i * 100 + 100, IDs.length)),
+      IDs.slice(i * GAP, Math.min(i * GAP + GAP, IDs.length)),
       (result, err) => {
         if (err) {
           console.log(err);
           saveResultsToFile(`errors/err_${i}.txt`, err.stack);
         } else {
           console.log(result);
-          saveResultsToFile(`results/res_${i}.json`, JSON.stringify(result));
+          saveResultsToFile(
+            `results/res_${i}.json, workerID: ${result.workerID}`,
+            JSON.stringify(result.result)
+          );
         }
       }
     );

@@ -54,7 +54,9 @@ const crawl = async ID => {
     fs.writeFileSync(`html/res_${ID}.html`, res.data);
     console.log(`SUCCESS html/res_${ID}.html, workerID: ${workerID}`);
   } catch (err) {
-    console.log(`ERROR with ID: ${ID}, message: ${err.message}`);
+    console.log(
+      `ERROR with ID: ${ID}, message: ${err.message}, workerID: ${workerID}`
+    );
     let invalidTime = invalidMap.get(ID);
 
     if (invalidTime >= 5) {
@@ -71,16 +73,17 @@ const run = async data => {
   workerID = data.workerID;
   IDs = data.data;
   for (let i = 0; i < IDs.length; ++i) {
-    if (fs.existsSync(`html/res_${IDs[i]}.html`)) continue;
     await crawl(IDs[i]);
   }
 
   IDs = [];
 
-  parentPort.postMessage(Array.from(invalidIDs));
+  const res = [...invalidIDs];
 
   invalidIDs.clear();
   invalidMap.clear();
+
+  parentPort.postMessage(Array.from(res));
 };
 
 parentPort.on('message', run);
